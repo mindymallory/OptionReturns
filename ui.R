@@ -1,3 +1,4 @@
+#[copyright: Mindy L Mallory 2015]
 library(shiny)
 
 # Define UI for application
