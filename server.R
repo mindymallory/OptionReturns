@@ -222,13 +222,12 @@ shinyServer(function(input, output) {
     contracts2     <- input$invested/(c_*100)
     opt_realized   <- (1+GL_Percent/100)*input$invested
     
-               
-     x1      <- data.frame(input$ticker, contracts1, sec_realized)
-                colnames(x1) <- c(paste0("Ticker: Invested ", "$", input$invested), "Contracts Purchased", "Realized Value")
-     x2      <- data.frame(paste("Black-Scholes", toString(input$callput), "option price maturing in", toString(input$daystomat), "days"), 
-                           contracts2, opt_realized)
-                colnames(x2) <- c(paste0("Ticker: Invested ", "$", input$invested), "Contracts Purchased", "Realized Value")
-     
+    x1      <- data.frame(input$ticker, paste0(input$return, "%"), contracts1, sec_realized)
+    colnames(x1) <- c(paste0("Ticker: Invested ", "$", input$invested), "% Return", "Contracts Purchased", "Realized Value")
+    x2      <- data.frame(paste("Black-Scholes", toString(input$callput), "option price maturing in", toString(input$daystomat), "days"), 
+                          g_percent, contracts2, opt_realized)
+    colnames(x2) <- c(paste0("Ticker: Invested ", "$", input$invested), "% Return", "Contracts Purchased", "Realized Value")
+    
      table2  <- rbind(x1, x2)    
     } else{
       s   = getQuote(input$ticker)
@@ -270,11 +269,11 @@ shinyServer(function(input, output) {
       opt_realized   <- (1+GL_Percent/100)*input$invested
       
       
-      x1      <- data.frame(input$ticker, contracts1, sec_realized)
-      colnames(x1) <- c(paste0("Ticker: Invested ", "$", input$invested), "Contracts Purchased", "Realized Value")
+      x1      <- data.frame(input$ticker, paste0(input$return, "%"), contracts1, sec_realized)
+      colnames(x1) <- c(paste0("Ticker: Invested ", "$", input$invested), "% Return", "Contracts Purchased", "Realized Value")
       x2      <- data.frame(paste("Black-Scholes", toString(input$callput), "option price maturing in", toString(input$daystomat), "days"), 
-                            contracts2, opt_realized)
-      colnames(x2) <- c(paste0("Ticker: Invested ", "$", input$invested), "Contracts Purchased", "Realized Value")
+                            g_percent, contracts2, opt_realized)
+      colnames(x2) <- c(paste0("Ticker: Invested ", "$", input$invested), "% Return", "Contracts Purchased", "Realized Value")
       
       table2  <- rbind(x1, x2)    
     }

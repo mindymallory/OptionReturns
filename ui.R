@@ -5,7 +5,7 @@ library(shiny)
 shinyUI(fluidPage(
   
   # Application Title
-  titlePanel("Demonstrating Leverate in Option Markets"),
+  titlePanel("Demonstrating Leverage in Option Markets"),
   
   # Sidebar with a slider input for the number of bins
   sidebarLayout(
