@@ -1,5 +1,6 @@
 library(shiny)
 library(ggplot2)
+library(quantmod)
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
@@ -21,49 +22,41 @@ shinyServer(function(input, output) {
     vol = input$volatiltiy/100
  
        # BS Price of option when sold
-    C <- function(x){pnorm((log(x/K)+(r+vol^2/2)*(T-t))/(vol*sqrt((T-t))))*x -
+    C     <- function(x){pnorm((log(x/K)+(r+vol^2/2)*(T-t))/(vol*sqrt((T-t))))*x -
         pnorm((log(x/K)+(r+vol^2/2)*(T-t))/(vol*sqrt((T-t))) - vol*sqrt((T-t)))*K*exp(-r*(T-t))}
     
     # BS Price of option when purchased
-    C_ <- function(x){pnorm((log(x/K)+(r+vol^2/2)*(T))/(vol*sqrt((T))))*x -
+    C_    <- function(x){pnorm((log(x/K)+(r+vol^2/2)*(T))/(vol*sqrt((T))))*x -
         pnorm((log(x/K)+(r+vol^2/2)*(T))/(vol*sqrt((T))) - vol*sqrt((T)))*K*exp(-r*(T))} 
-    
-  X <- c(K, S)
-  Y <- c(C_(K), C(S))
-  df <- data.frame(X,Y)
-  GL = C(S) - C_(K)
+    Pay   <- function(x){x-K}
+    zero  <- function(x){0}
+  c_      <- C_(K)     
+  c       <- C(S)
+  X       <- data.frame(K, c_, "At Purchase of Option" )
+             colnames(X) = c("Underlying", "Option", "Time")
+  Y       <- data.frame(S, c, "At Sale of Option")
+             colnames(Y) = c("Underlying", "Option", "Time")
+  
+  point   <- rbind(X,Y)
+  factor(point$Time) 
+  
+ 
+  GL = c - c_
   g = toString(round(GL,2))
-  GL_Percent = GL/C_(K)*100
+  GL_Percent = GL/c_*100
   g_percent = paste0(toString(round(GL_Percent,2)), '%')
  
-#    ggplot(df, aes(x=X, y=Y)) + 
-#                        geom_point() +
-#                        stat_function(fun = C) +
-#                        stat_function(fun = C_) +
-#                        xlim(0.95*K, 1.05*K) 
-#                        
-  #plot.window(c(.90*K,1.1*K), c(.9*C(S), 1.1*C(S)))
-  curve(pnorm((log(x/K)+(r+vol^2/2)*T)/(vol*sqrt(T)))*x-pnorm((log(x/K)+(r+vol^2/2)*T)/(vol*sqrt(T))- vol*sqrt(T))*K*exp(-r*T), 
-        from = .95*K, to=1.05*K, xlab = "Price of Underlying", ylim= c(0,3*C(S)), ylab = "Option Price", main = "Option Price", col="black")
-    par(new=TRUE)
-  curve(pnorm((log(x/K)+(r+vol^2/2)*(T-t))/(vol*sqrt((T-t))))*x-pnorm((log(x/K)+(r+vol^2/2)*(T-t))/(vol*sqrt((T-t)))- vol*sqrt((T-t)))*K*exp(-r*(T-t)), 
-        from = .95*K, to=1.05*K, xlab = "Price of Underlying", ylim= c(0,3*C(S)),ylab = "Option Price", main = "Option Price", col="red")
-    par(new=TRUE)
-#   plot(K,C_(K), xlim =c(.90*K,1.1*K), xlab = "Price of Underlying", ylab = "Option Price", main = "Option Price")
-#     par(new=TRUE)
-#   plot(S,C(S), xlim =c(.90*K,1.1*K), xlab = "Price of Underlying", ylab = "Option Price", main = "Option Price")
-    legend("topright", inset = .05, title = "Option Gain/Loss", c(g, g_percent))
-        abline(v=S)
-        abline(v=K)   
-#     #Graphing the Position Value
-#     curve(q*Q*(pnorm((log(x/K)+(r+vol^2/2)*t)/(vol*sqrt(t)))*x-pnorm((log(x/K)+(r+vol^2/2)*t)/(vol*sqrt(t))- vol*sqrt(t))*K*exp(-r*t)), 
-#           from = .9*K, to=1.1*K, xlab = "Price of Underlying", ylab = "Position Value", main = "Position Value")
-#     abline(v=S)
-#     abline(v=K)
-#     PosV = C*q*Q 
-#     PosV_ = C_*q*Q
-#     GL = PosV - PosV_
-#     g = toString(round(GL,2))
-#     legend("topright", inset = .05, title = "Gain/Loss", c(g))
+  # Build the Call Graph
+  palette <- c("red", "blue")
+     ggplot(data=point, aes(x=Underlying, y=Option, colour = Time)) + 
+                       geom_point(size=5, show_guide=TRUE) +
+                       stat_function(fun = C, colour =palette[2]) +
+                       stat_function(fun = C_, colour = palette[1]) +
+                       stat_function(fun = Pay, colour="black", size=1) +
+                       stat_function(fun = zero, colour="black") +
+                       scale_colour_manual(values=palette) +
+                       xlim(0.90*K, 1.1*K) +
+                       ylim(0, 3*c)
+                       
    })
 })
