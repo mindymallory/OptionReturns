@@ -1,6 +1,8 @@
 # OptionReturns
 
-This is a Shiny web app that calculates the return on an at-the-money European call/put option, given a designated return in the underlying. 
+This is a Shiny web app that calculates the return on an at-the-money European call/put option, given a designated return in the underlying. Hosted at: 
+
+https://mindymallory.shinyapps.io/OptionReturns 
 
 # User Inputs
 
